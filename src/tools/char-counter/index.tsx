@@ -2,7 +2,7 @@ import { useMemo, useState, type ReactNode } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { Copy, Eraser, Sparkles, WholeWord } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { Textarea } from "@/components/ui/Textarea";
+import { HighlightedTextarea } from "@/components/ui/HighlightedTextarea";
 import { SegmentedToggle } from "@/components/ui/SegmentedToggle";
 import { useCopy } from "@/hooks/useCopy";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
@@ -14,7 +14,6 @@ import {
   computeStats,
   formatSummary,
   type Granularity,
-  type MapToken,
   type TextStats,
 } from "./stats";
 
@@ -26,6 +25,10 @@ const SAMPLE =
 
 // ── building blocks ─────────────────────────────────────────────────────────
 
+/**
+ * A single metric. Click (or Enter/Space) copies the raw value — numbers are
+ * copied unformatted (1,245 → 1245).
+ */
 function Stat({
   label,
   value,
@@ -33,18 +36,30 @@ function Stat({
   color,
 }: {
   label: string;
-  value: ReactNode;
+  value: number | string;
   big?: boolean;
   color?: string;
 }) {
+  const copy = useCopy();
+  const display = typeof value === "number" ? value.toLocaleString() : value;
+  const raw = typeof value === "number" ? String(value) : value;
+
   return (
-    <motion.div
+    <motion.button
+      type="button"
       variants={fadeUp}
+      whileTap={{ scale: 0.985 }}
+      onClick={() => copy(raw, `Copied ${raw}`)}
+      aria-label={`Copy ${label}`}
       className={cn(
-        "rounded-lg border border-border bg-surface px-4 py-3",
+        "group relative w-full cursor-pointer overflow-hidden rounded-lg border border-border bg-surface px-4 py-3 text-left transition-colors hover:border-border-strong hover:bg-surface-2",
         big && "sm:py-5",
       )}
     >
+      <Copy
+        size={13}
+        className="absolute right-2.5 top-2.5 text-fg-subtle opacity-0 transition-opacity group-hover:opacity-100"
+      />
       <div
         className={cn(
           "truncate font-medium tabular-nums text-fg",
@@ -52,12 +67,12 @@ function Stat({
         )}
         style={color ? { color } : undefined}
       >
-        {value}
+        {display}
       </div>
       <div className="mt-1 text-[11px] lowercase tracking-wide text-fg-muted">
         {label}
       </div>
-    </motion.div>
+    </motion.button>
   );
 }
 
@@ -77,10 +92,10 @@ function SimpleStats({ stats }: { stats: TextStats }) {
       animate="show"
       className="grid grid-cols-2 gap-3 lg:grid-cols-4"
     >
-      <Stat big color="var(--color-ansi-green)" label="words" value={stats.words.toLocaleString()} />
-      <Stat big color="var(--color-ansi-cyan)" label="characters" value={stats.graphemes.toLocaleString()} />
-      <Stat big color="var(--color-ansi-amber)" label="letters" value={stats.letters.toLocaleString()} />
-      <Stat big color="var(--color-ansi-magenta)" label="paragraphs" value={stats.paragraphs.toLocaleString()} />
+      <Stat big color="var(--color-ansi-green)" label="words" value={stats.words} />
+      <Stat big color="var(--color-ansi-cyan)" label="characters" value={stats.graphemes} />
+      <Stat big color="var(--color-ansi-amber)" label="letters" value={stats.letters} />
+      <Stat big color="var(--color-ansi-magenta)" label="paragraphs" value={stats.paragraphs} />
     </motion.div>
   );
 }
@@ -96,17 +111,17 @@ function AdvancedStats({ stats }: { stats: TextStats }) {
           animate="show"
           className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-4"
         >
-          <Stat label="words" value={stats.words.toLocaleString()} />
-          <Stat label="characters" value={stats.graphemes.toLocaleString()} />
-          <Stat label="chars no spaces" value={stats.charsNoSpaces.toLocaleString()} />
-          <Stat label="letters" value={stats.letters.toLocaleString()} />
-          <Stat label="digits" value={stats.digits.toLocaleString()} />
-          <Stat label="punctuation" value={stats.punctuation.toLocaleString()} />
-          <Stat label="spaces" value={stats.spaces.toLocaleString()} />
-          <Stat label="whitespace" value={stats.whitespace.toLocaleString()} />
-          <Stat label="sentences" value={stats.sentences.toLocaleString()} />
-          <Stat label="paragraphs" value={stats.paragraphs.toLocaleString()} />
-          <Stat label="lines" value={stats.lines.toLocaleString()} />
+          <Stat label="words" value={stats.words} />
+          <Stat label="characters" value={stats.graphemes} />
+          <Stat label="chars no spaces" value={stats.charsNoSpaces} />
+          <Stat label="letters" value={stats.letters} />
+          <Stat label="digits" value={stats.digits} />
+          <Stat label="punctuation" value={stats.punctuation} />
+          <Stat label="spaces" value={stats.spaces} />
+          <Stat label="whitespace" value={stats.whitespace} />
+          <Stat label="sentences" value={stats.sentences} />
+          <Stat label="paragraphs" value={stats.paragraphs} />
+          <Stat label="lines" value={stats.lines} />
         </motion.div>
       </div>
 
@@ -118,10 +133,10 @@ function AdvancedStats({ stats }: { stats: TextStats }) {
           animate="show"
           className="grid grid-cols-2 gap-2.5 sm:grid-cols-4"
         >
-          <Stat label="graphemes" value={stats.graphemes.toLocaleString()} />
-          <Stat label="code points" value={stats.codePoints.toLocaleString()} />
-          <Stat label="utf-16 units" value={stats.utf16.toLocaleString()} />
-          <Stat label="bytes (utf-8)" value={stats.bytes.toLocaleString()} />
+          <Stat label="graphemes" value={stats.graphemes} />
+          <Stat label="code points" value={stats.codePoints} />
+          <Stat label="utf-16 units" value={stats.utf16} />
+          <Stat label="bytes (utf-8)" value={stats.bytes} />
         </motion.div>
       </div>
 
@@ -133,7 +148,7 @@ function AdvancedStats({ stats }: { stats: TextStats }) {
           animate="show"
           className="grid grid-cols-2 gap-2.5 sm:grid-cols-3"
         >
-          <Stat label="unique words" value={stats.uniqueWords.toLocaleString()} />
+          <Stat label="unique words" value={stats.uniqueWords} />
           <Stat label="longest word" value={stats.longestWord || "—"} />
           <Stat label="avg word length" value={stats.avgWordLength.toFixed(1)} />
           <Stat label="avg sentence (words)" value={stats.avgSentenceLength.toFixed(1)} />
@@ -145,82 +160,51 @@ function AdvancedStats({ stats }: { stats: TextStats }) {
   );
 }
 
-function TextMap({
-  tokens,
-  interactive,
-}: {
-  tokens: MapToken[];
-  interactive: boolean;
-}) {
-  if (!tokens.length) {
-    return (
-      <div className="rounded-lg border border-dashed border-border px-4 py-10 text-center text-sm text-fg-subtle">
-        $ paste or type above to see the map…
-      </div>
-    );
-  }
-
-  return (
-    <div className="overflow-hidden whitespace-pre-wrap break-words rounded-lg border border-border bg-surface p-4 text-sm leading-relaxed">
-      {tokens.map((tok, i) => {
-        if (tok.colorIndex === null) return <span key={i}>{tok.text}</span>;
-        const color = ANSI_PALETTE[tok.colorIndex % ANSI_PALETTE.length];
-        return (
-          <span
-            key={i}
-            className={cn(
-              "rounded-[3px] transition-[filter] duration-150",
-              interactive && "cursor-default hover:brightness-150",
-            )}
-            style={{
-              color,
-              backgroundColor: `color-mix(in oklab, ${color} 12%, transparent)`,
-            }}
-            title={
-              interactive
-                ? `${tok.words} ${tok.words === 1 ? "word" : "words"} · ${tok.graphemes} chars`
-                : undefined
-            }
-          >
-            {tok.text}
-          </span>
-        );
-      })}
-    </div>
-  );
-}
-
 // ── tool ────────────────────────────────────────────────────────────────────
 
 export default function CharCounter() {
   const [text, setText] = useState("");
   const [mode, setMode] = useLocalStorage<Mode>("char-counter:mode", "simple");
-  const [granularity, setGranularity] = useState<Granularity>("word");
+  const [grouping, setGrouping] = useLocalStorage<Granularity>(
+    "char-counter:grouping",
+    "word",
+  );
   const copy = useCopy();
 
   const stats = useMemo(() => computeStats(text), [text]);
-  const mapTokens = useMemo(
-    () => buildMap(text, mode === "simple" ? "word" : granularity),
-    [text, mode, granularity],
+  const segments = useMemo(
+    () =>
+      buildMap(text, grouping).map((t) => ({
+        text: t.text,
+        color:
+          t.colorIndex === null
+            ? undefined
+            : ANSI_PALETTE[t.colorIndex % ANSI_PALETTE.length],
+      })),
+    [text, grouping],
   );
 
   return (
     <div className="space-y-5">
-      <Textarea
+      <HighlightedTextarea
         value={text}
-        onChange={(e) => setText(e.target.value)}
+        onChange={setText}
+        segments={segments}
         placeholder="Paste or type your text here…"
-        className="min-h-[180px]"
+        ariaLabel="Text to analyze"
       />
 
       <div className="flex flex-wrap items-center gap-2">
-        <SegmentedToggle<Mode>
-          ariaLabel="Detail level"
-          value={mode}
-          onChange={setMode}
+        <SegmentedToggle<Granularity>
+          size="sm"
+          ariaLabel="Color grouping"
+          value={grouping}
+          onChange={setGrouping}
           options={[
-            { value: "simple", label: "Simple" },
-            { value: "advanced", label: "Advanced", icon: WholeWord },
+            { value: "none", label: "none" },
+            { value: "word", label: "words" },
+            { value: "sentence", label: "sentences" },
+            { value: "paragraph", label: "paragraphs" },
           ]}
         />
         <div className="ml-auto flex items-center gap-2">
@@ -248,48 +232,38 @@ export default function CharCounter() {
         </div>
       </div>
 
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.div
-          key={mode}
-          initial={{ opacity: 0, y: 4 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -4 }}
-          transition={{ duration: 0.15 }}
-        >
-          {mode === "simple" ? (
-            <SimpleStats stats={stats} />
-          ) : (
-            <AdvancedStats stats={stats} />
-          )}
-        </motion.div>
-      </AnimatePresence>
-
-      <section className="space-y-2">
-        <div className="flex flex-wrap items-center justify-between gap-2">
+      <section className="space-y-3">
+        <div className="flex items-center justify-between gap-2">
           <h3 className="text-xs uppercase tracking-wider text-fg-muted">
-            <span className="text-accent">#</span>{" "}
-            {mode === "simple" ? "word map" : "text map"}
+            <span className="text-accent">#</span> stats
           </h3>
-          {mode === "advanced" && (
-            <SegmentedToggle<Granularity>
-              size="sm"
-              ariaLabel="Segment by"
-              value={granularity}
-              onChange={setGranularity}
-              options={[
-                { value: "sentence", label: "sentences" },
-                { value: "paragraph", label: "paragraphs" },
-                { value: "word", label: "words" },
-              ]}
-            />
-          )}
+          <SegmentedToggle<Mode>
+            size="sm"
+            ariaLabel="Detail level"
+            value={mode}
+            onChange={setMode}
+            options={[
+              { value: "simple", label: "Simple" },
+              { value: "advanced", label: "Advanced", icon: WholeWord },
+            ]}
+          />
         </div>
-        <TextMap tokens={mapTokens} interactive={mode === "advanced"} />
-        {mode === "advanced" && text && (
-          <p className="text-[11px] text-fg-subtle">
-            hover a segment to inspect its counts.
-          </p>
-        )}
+
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={mode}
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.15 }}
+          >
+            {mode === "simple" ? (
+              <SimpleStats stats={stats} />
+            ) : (
+              <AdvancedStats stats={stats} />
+            )}
+          </motion.div>
+        </AnimatePresence>
       </section>
     </div>
   );

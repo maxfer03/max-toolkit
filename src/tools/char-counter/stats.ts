@@ -1,4 +1,4 @@
-export type Granularity = "sentence" | "paragraph" | "word";
+export type Granularity = "none" | "word" | "sentence" | "paragraph";
 
 export interface TextStats {
   words: number;
@@ -149,6 +149,7 @@ function gap(text: string): MapToken {
  */
 export function buildMap(text: string, granularity: Granularity): MapToken[] {
   if (!text) return [];
+  if (granularity === "none") return [gap(text)];
   let cycle = 0;
   const paint = (run: MapToken): MapToken =>
     run.colorIndex === null ? run : { ...run, colorIndex: cycle++ };
