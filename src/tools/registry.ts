@@ -1,5 +1,5 @@
 import { lazy } from "react";
-import { Braces, Binary, Fingerprint } from "lucide-react";
+import { Braces, Binary, Fingerprint, WholeWord } from "lucide-react";
 import type { Tool } from "./types";
 
 /**
@@ -38,6 +38,24 @@ export const tools: Tool[] = [
     keywords: ["uuid", "guid", "id", "random", "v4", "generate"],
     category: "generate",
     component: lazy(() => import("./uuid-generator")),
+  },
+  {
+    id: "char-counter",
+    name: "Char Counter",
+    description: "Count everything: characters, words, sentences & more.",
+    icon: WholeWord,
+    keywords: [
+      "count",
+      "characters",
+      "words",
+      "letters",
+      "text",
+      "sentences",
+      "length",
+      "counter",
+    ],
+    category: "text",
+    component: lazy(() => import("./char-counter")),
   },
 ];
 
