@@ -1,5 +1,12 @@
 import { lazy } from "react";
-import { Braces, Binary, Fingerprint, WholeWord, Percent } from "lucide-react";
+import {
+  Braces,
+  Binary,
+  Fingerprint,
+  WholeWord,
+  Percent,
+  NotebookPen,
+} from "lucide-react";
 import type { Tool } from "./types";
 
 /**
@@ -75,6 +82,15 @@ export const tools: Tool[] = [
     ],
     category: "math",
     component: lazy(() => import("./percentage-calculator")),
+  },
+  {
+    id: "notes",
+    name: "Notes",
+    description: "A quick, low-friction scratchpad. Saved in your browser.",
+    icon: NotebookPen,
+    keywords: ["note", "notes", "scratchpad", "memo", "write", "jot", "text"],
+    category: "text",
+    component: lazy(() => import("./notes")),
   },
 ];
 
