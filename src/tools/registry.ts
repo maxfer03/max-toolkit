@@ -6,6 +6,7 @@ import {
   WholeWord,
   Percent,
   NotebookPen,
+  Pilcrow,
 } from "lucide-react";
 import type { Tool } from "./types";
 
@@ -91,6 +92,24 @@ export const tools: Tool[] = [
     keywords: ["note", "notes", "scratchpad", "memo", "write", "jot", "text"],
     category: "text",
     component: lazy(() => import("./notes")),
+  },
+  {
+    id: "lorem-ipsum",
+    name: "Lorem Ipsum",
+    description: "Placeholder text from Borges, classic lorem, or your own.",
+    icon: Pilcrow,
+    keywords: [
+      "lorem",
+      "ipsum",
+      "placeholder",
+      "dummy",
+      "filler",
+      "text",
+      "borges",
+      "generator",
+    ],
+    category: "generate",
+    component: lazy(() => import("./lorem-ipsum")),
   },
 ];
 
