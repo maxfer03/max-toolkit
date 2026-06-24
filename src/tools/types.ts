@@ -1,7 +1,7 @@
 import type { ComponentType, LazyExoticComponent } from "react";
 import type { LucideIcon } from "lucide-react";
 
-export type CategoryId = "dev" | "text" | "convert" | "generate" | "web";
+export type CategoryId = "dev" | "text" | "convert" | "math" | "generate" | "web";
 
 /**
  * The single contract every tool fulfils. The registry is a list of these,

@@ -1,5 +1,5 @@
 import { lazy } from "react";
-import { Braces, Binary, Fingerprint, WholeWord } from "lucide-react";
+import { Braces, Binary, Fingerprint, WholeWord, Percent } from "lucide-react";
 import type { Tool } from "./types";
 
 /**
@@ -56,6 +56,25 @@ export const tools: Tool[] = [
     ],
     category: "text",
     component: lazy(() => import("./char-counter")),
+  },
+  {
+    id: "percentage-calculator",
+    name: "Percentage Calculator",
+    description: "Quick percentage calculations in plain language.",
+    icon: Percent,
+    keywords: [
+      "percent",
+      "percentage",
+      "%",
+      "calc",
+      "calculator",
+      "ratio",
+      "increase",
+      "decrease",
+      "change",
+    ],
+    category: "math",
+    component: lazy(() => import("./percentage-calculator")),
   },
 ];
 
