@@ -1,14 +1,15 @@
 import { lazy } from "react";
 import {
-  Braces,
   Binary,
+  Braces,
   Fingerprint,
-  WholeWord,
-  Percent,
   NotebookPen,
+  Percent,
   Pilcrow,
+  UserRound,
+  WholeWord,
 } from "lucide-react";
-import type { Tool } from "./types";
+import type { Tool, ToolShortcut } from "./types";
 
 /**
  * The toolkit's single source of truth.
@@ -111,9 +112,91 @@ export const tools: Tool[] = [
     category: "generate",
     component: lazy(() => import("./lorem-ipsum")),
   },
+  {
+    id: "fake-data",
+    name: "Fake Data",
+    description: "Generate realistic placeholder identities, IDs, contacts & more.",
+    icon: UserRound,
+    keywords: [
+      "fake",
+      "data",
+      "dummy",
+      "placeholder",
+      "generate",
+      "random",
+      "identity",
+      "profile",
+      "persona",
+      "dni",
+      "rut",
+      "cuit",
+      "cuil",
+      "email",
+      "phone",
+      "address",
+      "credit",
+      "card",
+      "iban",
+      "argentina",
+      "chile",
+    ],
+    category: "generate",
+    component: lazy(() => import("./fake-data")),
+  },
 ];
 
 const byId = new Map(tools.map((t) => [t.id, t]));
 
 export const getTool = (id: string | undefined): Tool | undefined =>
   id ? byId.get(id) : undefined;
+
+export const shortcuts: ToolShortcut[] = [
+  {
+    name: "RUT",
+    description: "Generate Chilean RUT numbers",
+    keywords: ["rut", "chile", "chileno", "id"],
+    icon: UserRound,
+    category: "generate",
+    href: "/tools/fake-data?s=national-ids&t=rut",
+  },
+  {
+    name: "DNI",
+    description: "Generate Argentine DNI numbers",
+    keywords: ["dni", "argentina", "argentino", "id"],
+    icon: UserRound,
+    category: "generate",
+    href: "/tools/fake-data?s=national-ids&t=dni",
+  },
+  {
+    name: "CUIT",
+    description: "Generate Argentine CUIT numbers",
+    keywords: ["cuit", "argentina", "impuesto", "fiscal"],
+    icon: UserRound,
+    category: "generate",
+    href: "/tools/fake-data?s=national-ids&t=cuit",
+  },
+  {
+    name: "CUIL",
+    description: "Generate Argentine CUIL numbers",
+    keywords: ["cuil", "argentina", "laboral"],
+    icon: UserRound,
+    category: "generate",
+    href: "/tools/fake-data?s=national-ids&t=cuil",
+  },
+  {
+    name: "Fake Email",
+    description: "Generate random email addresses",
+    keywords: ["fake", "email", "correo", "random"],
+    icon: UserRound,
+    category: "generate",
+    href: "/tools/fake-data?s=contact&t=email",
+  },
+  {
+    name: "Fake Profile",
+    description: "Generate complete fake person profiles",
+    keywords: ["fake", "profile", "perfil", "persona", "identity"],
+    icon: UserRound,
+    category: "generate",
+    href: "/tools/fake-data?s=profile",
+  },
+];

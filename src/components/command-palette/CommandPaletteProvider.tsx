@@ -11,7 +11,7 @@ import { Command } from "cmdk";
 import { useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "motion/react";
 import { Search } from "lucide-react";
-import { tools } from "@/tools/registry";
+import { shortcuts, tools } from "@/tools/registry";
 import { categories, categoryOrder } from "@/tools/categories";
 import { snap } from "@/lib/motion";
 
@@ -61,10 +61,10 @@ export function CommandPaletteProvider({ children }: { children: ReactNode }) {
     return () => document.removeEventListener("keydown", onKey);
   }, []);
 
-  const select = useCallback(
-    (id: string) => {
+  const selectHref = useCallback(
+    (href: string) => {
       setOpen(false);
-      navigate(`/tools/${id}`);
+      navigate(href);
     },
     [navigate],
   );
@@ -105,6 +105,31 @@ export function CommandPaletteProvider({ children }: { children: ReactNode }) {
                   <Command.Empty className="px-3 py-8 text-center text-sm text-fg-subtle">
                     No tools found.
                   </Command.Empty>
+                  {shortcuts.length > 0 && (
+                    <Command.Group
+                      heading="Quick jump"
+                      className="text-fg-subtle [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-[10px] [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-wider"
+                    >
+                      {shortcuts.map((s) => {
+                        const Icon = s.icon;
+                        const cat = categories[s.category];
+                        return (
+                          <Command.Item
+                            key={s.href}
+                            value={`${s.name} ${s.description} ${s.keywords.join(" ")}`}
+                            onSelect={() => selectHref(s.href)}
+                            className="flex cursor-pointer items-center gap-3 rounded-md px-2 py-2 text-sm text-fg-muted aria-selected:bg-surface-2 aria-selected:text-fg data-[selected=true]:bg-surface-2 data-[selected=true]:text-fg"
+                          >
+                            <Icon size={16} style={{ color: cat.color }} />
+                            <span className="text-fg">{s.name}</span>
+                            <span className="ml-auto truncate pl-3 text-xs text-fg-subtle">
+                              {s.description}
+                            </span>
+                          </Command.Item>
+                        );
+                      })}
+                    </Command.Group>
+                  )}
                   {categoryOrder.map((cid) => {
                     const items = tools.filter((t) => t.category === cid);
                     if (!items.length) return null;
@@ -121,7 +146,7 @@ export function CommandPaletteProvider({ children }: { children: ReactNode }) {
                             <Command.Item
                               key={t.id}
                               value={`${t.name} ${t.keywords.join(" ")}`}
-                              onSelect={() => select(t.id)}
+                              onSelect={() => selectHref(`/tools/${t.id}`)}
                               className="flex cursor-pointer items-center gap-3 rounded-md px-2 py-2 text-sm text-fg-muted aria-selected:bg-surface-2 aria-selected:text-fg data-[selected=true]:bg-surface-2 data-[selected=true]:text-fg"
                             >
                               <Icon size={16} style={{ color: cat.color }} />

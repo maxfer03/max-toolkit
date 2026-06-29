@@ -19,3 +19,17 @@ export interface Tool {
   /** Lazy-loaded so each tool is code-split and the shell stays fast. */
   component: LazyExoticComponent<ComponentType>;
 }
+
+/**
+ * A palette shortcut that deep-links into a tool section without creating a
+ * new route. Used for entries like "RUT" -> /tools/fake-data?s=national-ids&t=rut.
+ */
+export interface ToolShortcut {
+  name: string;
+  description: string;
+  keywords: string[];
+  icon: LucideIcon;
+  category: CategoryId;
+  /** Internal href with query params, e.g. "/tools/fake-data?s=national-ids&t=rut". */
+  href: string;
+}
