@@ -47,19 +47,26 @@ export default function UuidGenerator() {
         {ids.map((id, i) => (
           <li
             key={id}
-            className="group flex items-center gap-3 border-b border-border bg-surface px-3 py-2 last:border-b-0 hover:bg-surface-2"
+            role="button"
+            tabIndex={0}
+            onClick={() => copy(id)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                copy(id);
+              }
+            }}
+            aria-label={`Copy ${id}`}
+            className="group flex cursor-pointer items-center gap-3 border-b border-border bg-surface px-3 py-2 last:border-b-0 hover:bg-surface-2"
           >
             <span className="w-6 text-right text-xs text-fg-subtle">
               {i + 1}
             </span>
             <code className="text-sm text-fg">{id}</code>
-            <button
-              onClick={() => copy(id)}
-              className="ml-auto text-fg-subtle opacity-0 transition-opacity hover:text-accent group-hover:opacity-100"
-              aria-label="Copy this UUID"
-            >
-              <Copy size={14} />
-            </button>
+            <Copy
+              size={14}
+              className="ml-auto text-fg-subtle opacity-0 transition-opacity group-hover:text-accent group-hover:opacity-100"
+            />
           </li>
         ))}
       </ul>

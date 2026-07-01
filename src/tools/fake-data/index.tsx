@@ -243,7 +243,17 @@ function ProfileSection({
           <motion.li
             key={`${profile.id}-${index}`}
             variants={fadeUp}
-            className="rounded-lg border border-border bg-surface p-3 text-xs text-fg-muted"
+            role="button"
+            tabIndex={0}
+            onClick={() => copy(formatProfileText(profile), "Profile copied")}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                copy(formatProfileText(profile), "Profile copied");
+              }
+            }}
+            aria-label={`Copy ${profile.name.full}'s profile`}
+            className="group cursor-pointer rounded-lg border border-border bg-surface p-3 text-xs text-fg-muted transition-colors hover:bg-surface-2"
           >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 flex-1 space-y-0.5">
@@ -262,14 +272,10 @@ function ProfileSection({
                   {profile.address}
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={() => copy(formatProfileText(profile), "Profile copied")}
-                className="shrink-0 text-fg-subtle transition-colors hover:text-accent"
-                aria-label="Copy profile"
-              >
-                <Copy size={14} />
-              </button>
+              <Copy
+                size={14}
+                className="shrink-0 text-fg-subtle opacity-100 transition-colors group-hover:text-accent sm:opacity-0 sm:transition-opacity sm:group-hover:opacity-100"
+              />
             </div>
           </motion.li>
         ))}
@@ -325,7 +331,17 @@ function BatchList({ items }: { items: string[] }) {
       {items.map((item, index) => (
         <li
           key={`${item}-${index}`}
-          className="group flex items-center gap-3 border-b border-border bg-surface px-3 py-2 last:border-b-0 hover:bg-surface-2"
+          role="button"
+          tabIndex={0}
+          onClick={() => copy(item)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              copy(item);
+            }
+          }}
+          aria-label={`Copy ${item}`}
+          className="group flex cursor-pointer items-center gap-3 border-b border-border bg-surface px-3 py-2 last:border-b-0 hover:bg-surface-2"
         >
           <span className="w-6 shrink-0 text-right text-xs text-fg-subtle">
             {index + 1}
@@ -333,14 +349,10 @@ function BatchList({ items }: { items: string[] }) {
           <code className="min-w-0 flex-1 break-all text-sm text-fg">
             {item}
           </code>
-          <button
-            type="button"
-            onClick={() => copy(item)}
-            className="shrink-0 text-fg-subtle opacity-100 transition-colors hover:text-accent sm:opacity-0 sm:transition-opacity sm:group-hover:opacity-100"
-            aria-label="Copy row"
-          >
-            <Copy size={14} />
-          </button>
+          <Copy
+            size={14}
+            className="shrink-0 text-fg-subtle opacity-100 transition-opacity group-hover:text-accent sm:opacity-0 sm:group-hover:opacity-100"
+          />
         </li>
       ))}
     </ul>
