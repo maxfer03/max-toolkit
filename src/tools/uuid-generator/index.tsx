@@ -1,15 +1,33 @@
 import { useState } from "react";
-import { Copy, RefreshCw } from "lucide-react";
+import { Copy, Download, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useCopy } from "@/hooks/useCopy";
 
 const make = (n: number): string[] =>
   Array.from({ length: n }, () => crypto.randomUUID());
 
+async function exportXlsx(ids: string[]): Promise<void> {
+  const XLSX = await import("xlsx");
+  const ws = XLSX.utils.json_to_sheet(ids.map((id) => ({ UUID: id })));
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "UUIDs");
+  XLSX.writeFile(wb, "uuids.xlsx");
+}
+
 export default function UuidGenerator() {
   const [count, setCount] = useState(5);
   const [ids, setIds] = useState<string[]>(() => make(5));
+  const [exporting, setExporting] = useState(false);
   const copy = useCopy();
+
+  const handleExport = async () => {
+    setExporting(true);
+    try {
+      await exportXlsx(ids);
+    } finally {
+      setExporting(false);
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -40,6 +58,15 @@ export default function UuidGenerator() {
           disabled={!ids.length}
         >
           <Copy size={14} /> Copy all
+        </Button>
+
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={handleExport}
+          disabled={exporting || !ids.length}
+        >
+          <Download size={14} /> {exporting ? "Exporting..." : "Export XLSX"}
         </Button>
       </div>
 
